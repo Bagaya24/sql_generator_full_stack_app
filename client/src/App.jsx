@@ -3,10 +3,26 @@ import styles from "./index.module.css"
 import sqlLogo from "./assets/sql-logo.png"
 
 function App() {
-  const [queryDescription, setQueryDescription] = useState("")
-  const onSubmit = (e) => {
+  const [queryDescription, setQueryDescription] = useState("");
+  const [sqlQuery, setSqlQuery] = useState("");
+  const onSubmit = async (e) => {
     e.preventDefault();
-    console.log("form submited:", queryDescription)
+    const generatedQuery = await generateQuery();
+    setSqlQuery(generatedQuery);
+    
+
+  };
+  
+  const generateQuery = async () => {
+    const response = await fetch("http://localhost:3005/generate", {
+      method: "POST",
+      headers:{
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ queryDescription: queryDescription }),
+    });
+    const data = await response.json()
+    return data.response
   }
 
   return (
@@ -22,6 +38,7 @@ function App() {
          onChange={(e) => setQueryDescription(e.target.value)}
          />
          <input type="submit" value="Generate" />
+         <pre>{sqlQuery}</pre>
       </form>
     </main>
   )
